@@ -1294,3 +1294,8 @@ service apache2 restart
 Hasil dari code ini dapat dilihat dalam client dengan mengetikkan `lynx www.parikesit.abimanyu.A02.com/abimanyugantenk`
 
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/1862cfef-1c5f-4f16-8dfb-716c285e4aa8)
+
+
+# Kendala
+- Terminal GNS3 dan telnet yang tidak memadai untuk copy sehingga script bisa disimpan di local
+- Baru menyadari adanya folder .zip di hampir akhir praktikum sehingga harus mengulang dari awal
