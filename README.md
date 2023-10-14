@@ -309,6 +309,7 @@ ping parikesit.abimanyu.A02.com -c 5
 ```
 
 Hasilnya adalah sebagai berikut
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/b5af2085-d932-4874-89fa-e085b09b495f)
 
 
@@ -529,6 +530,7 @@ ping www.baratayuda.abimanyu.A02.com -c 5
 ```
 
 Hasilnya adalah sebagai berikut:
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/3f4e7081-f7d6-494b-8bb5-e9b724fc06f2)
 
 
@@ -569,6 +571,7 @@ ping www.rjp.baratayuda.abimanyu.A02.com -c 5
 ```
 
 Hasilnya adalah sebagai berikut:
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/1703858b-d116-4318-bc65-a363cd5c4661)
 
 
@@ -671,6 +674,7 @@ lynx [ip webserver]
 ```
 
 Salah satu hasil pada node Prabukusuma:
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/fc648f4a-5178-4a9a-8e24-ed9c070ee675)
 
 
@@ -742,6 +746,7 @@ lynx 10.0.3.3:8002
 ```
 
 Dan hasilnya adalah sebagai berikut:
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/7dbbbef0-4e3c-4e55-870c-4bafafbba8f4)
 
 
@@ -790,6 +795,7 @@ lynx www.abimanyu.A02.com
 ```
 
 Hasilnya adalah sebagai berikut:
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/ad91fd4e-4eda-4891-b485-e427d47dd1fc)
 
 
@@ -847,6 +853,7 @@ curl www.abimanyu.A02.com/home
 ```
 
 Berikut merupakan contoh dari penggunaan command dengan curl:
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/aeb15b55-25f3-49b3-949b-58cf56194297)
 
 
@@ -895,6 +902,7 @@ Lalu, lihat hasil run pada client, dengan menuliskan command sebagai berikut
 ```
 lynx www.parikesit.abimanyu.A02.com
 ```
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/0fd636a4-68ec-4951-b543-96c057725c96)
 
 
@@ -959,9 +967,11 @@ lynx www.parikesit.abimanyu.A02.com
 
 Hasilnya adalah sebagai berikut:
 - Home dari webnya
+  
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/0b617247-311c-4bef-9919-2c1561b5fca5)
 
 - Jika kita memilih folder yang dilarang
+  
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/8880cb19-6026-4d5f-93bd-7c1dfeab2405)
 
 
@@ -1005,8 +1015,11 @@ Penjelasan:
 
 Hasil dari code ini dapat dilihat dalam node client dengan menuliskan command sebagai berikut:
 - Untuk menampilkan error 404, maka dapat menuliskan command `lynx www.parikesit.abimanyu.A02.com/hehehe`
+  
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/97e304bd-59f7-4047-891c-cdc85f000ae9)
+
 - Untuk menampikan error 403, maka dapat menuliskan command 'lynx www.parikesit.abimanyu.A02.com/secret'
+  
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/dd49ae83-d81f-4c7b-9680-c49b8c7d1e44)
 
 
@@ -1053,6 +1066,7 @@ Penjelasan:
 - Lakukan `service apache2 restart` untuk melakukan restart baru
 
 Jalankan `lynx www.parikesit.abimanyu.A02.com/js` untuk melihat isi js pada URL tersebut. Command ini dijalankan pada node client. Berikut adalah hasil setelah dijalankan
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/679de04e-e5d0-47ed-a619-4ea6e0d68645)
 
 
@@ -1116,6 +1130,7 @@ lynx www.rjp.baratayuda.abimanyu.A02.com:14400
 ```
 
 Hasilnya adalah sebagai berikut:
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/69dc3081-19b8-408e-858d-d9b3c068f925)
 
 
@@ -1173,6 +1188,7 @@ Penjelasan:
 untuk memberikan kredensial yang valid.
 
 Untuk melihat hasilnya, dapat diarahkan ke node client dan mengetikkan command `lynx www.rjp.baratayuda.abimanyu.A02.com`, dan hasilnya akan seperti berikut:
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/5b418a49-8a20-435b-a1ff-8bf2b5a74050)
 
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/f34c9cf6-c8e9-4881-b886-175c68cb9299)
@@ -1217,6 +1233,7 @@ lynx 10.0.3.3
 ```
 
 Berikut adalah hasil curl-nya:
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/c8d731e0-9ead-431b-9369-785508cdb9bc)
 
 
@@ -1275,4 +1292,5 @@ service apache2 restart
 ```
 
 Hasil dari code ini dapat dilihat dalam client dengan mengetikkan `lynx www.parikesit.abimanyu.A02.com/abimanyugantenk`
+
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/1862cfef-1c5f-4f16-8dfb-716c285e4aa8)
