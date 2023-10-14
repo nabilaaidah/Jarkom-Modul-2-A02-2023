@@ -253,6 +253,8 @@ $TTL    604800
 www     IN      CNAME   abimanyu.A02.com.
 ```
 
+Selanjutnya, jalankan command `service bind9 restart`
+
 Lalu, untuk melihat hasil dapat dilakukan di node client dengan mengetiikan command sebagai berikut
 
 ```
@@ -298,6 +300,8 @@ parikesit      IN      A       10.0.3.3
 Penjelasan:
 - Pada code ini, ditambahkan subdomain "parikesit"
 - `parikesit      IN      A       10.0.3.3` berarti bahwa subdomain "parikesit" akan dihubungkan dengan IP 10.0.3.3
+
+Lalu, jalankan command `service bind9 restart`
 
 Setelah itu, dapat dilihat hasilnya dalam node client. Untuk command yang digunakan adalah
 ```
@@ -345,6 +349,8 @@ $TTL    604800
 Penjelasan:
 - Pada code ini dapat diketahui bahwa IP 10.0.2.2 merujuk ke server "arjuna.A02.com"
 
+Lalu, jalankan command `service bind9 restart`
+
 Untuk melihat hasilnya di client, maka dapat dilakukan
 ```
 echo 'nameserver 192.168.122.1 > /etc/resolv.conf'
@@ -362,5 +368,172 @@ Hasil yang didapatkan adalah sebagai berikut
 # Nomor 6
 
 Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
+
+## Jawaban
+
+Pertama, edit konfigurasi pada `/etc/bind/named.conf.local` utamanya pada zone arjuna dan abimanyu menjadi seperti dibawah ini:
+```
+zone "arjuna.A02.com" {
+        type master;
+        notify yes;
+        also-notify { 10.0.1.5; }; // IP Werkudara
+        allow-transfer { 10.0.1.1; }; // IP Werkudara
+        file "/etc/bind/jarkom/arjuna.A02.com";
+};
+
+zone "abimanyu.A02.com" {
+        type master;
+        notify yes;
+        also-notify { 10.0.1.5; }; // IP Werkudara
+        allow-transfer { 10.0.1.5; }; // IP Werkudara
+        file "/etc/bind/jarkom/abimanyu.A02.com";
+};
+```
+Penjelasan:
+- `notify yes` berfungsi untuk memberi tahu server lain yang berhubungan jika terjadi perubahan
+- `also notify` berfungsi untuk memberi tahu server tertentu jika terjadi perubahan
+- `allow-transfer` berfungsi untuk server tertentu diizinkan mengambil salinan zona ini
+
+Lalu, jalankan command `service bind9 restart`
+
+Selanjutnya, pergi ke DNS Slave. Pada DNS Slave, jalankan command di bawah ini:
+```
+echo 'nameserver 192.168.122.1` > /etc/resolv.conf
+
+apt-get update
+apt-get install bind9 -y
+```
+
+Setelah itu, isikan command di bawah ini ke dalam `/etc/bind/named.conf.local`:
+```
+zone "arjuna.A02.com" {
+        type slave;
+       	masters { 10.0.1.4; }; // IP Yudhistira
+        file "/var/lib/bind/arjuna.A02.com";
+};
+
+zone "abimanyu.A02.com" {
+        type slave;
+       	masters { 10.0.1.4; }; // IP Yudhistira
+         file "/var/lib/bind/abimanyu.A02.com";
+};
+```
+Lalu, jalankan command `service bind9 restart`
+
+Untuk melihat hasil runnya, maka jalankan command `service bind9 stop` di dalam DNS Master. Setelah itu, pergi ke Client, dan jalankan command berikut:
+```
+echo 'nameserver 10.0.1.5' > /etc/resolv.conf
+```
+Langkah berikutnya, adalah jalankan command berikut untuk melihat hasilnya
+```
+ping arjuna.A02.com -c 5
+```
+dan
+```
+ping www.arjuna.A02.com -c 5
+```
+
+Hasil yang didapatkan adalah sebagai berikut:
+
+![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/ec65f2da-2476-4eb3-a555-4b302c85ba2c)
+
+
+Ps: Jangan lupa untuk menyalakan `service bind9 start` pada DNS Master dan `echo 'nameserver 10.0.1.4' > /etc/resolv.conf` pada Client
+
+
+# Soal 7
+
+Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatlah subdomain khusus untuk perang yaitu baratayuda.abimanyu.yyy.com dengan alias www.baratayuda.abimanyu.yyy.com yang didelegasikan dari Yudhistira ke Werkudara dengan IP menuju ke Abimanyu dalam folder Baratayuda.
+
+## Jawaban
+
+Ubah konfigurasi `/etc/bind/jarkom/abimanyu.A02.com` pada DNS Master menjadi seperti berikut:
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.A02.com. root.abimanyu.A02.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@              IN      NS      abimanyu.A02.com.
+@              IN      A       10.0.3.3
+www            IN      CNAME   abimanyu.A02.com.
+parikesit      IN      A       10.0.3.3
+ns1	       IN      A       10.0.1.5      
+baratayuda     IN      NS      ns1
+```
+Penjelasan:
+- `ns1	       IN      A       10.0.1.5` berarti bahwa subdomain ns1 berhubungan dengan alamat IP 10.0.1.5
+- `baratayuda     IN      NS      ns1` berarti bahwa ns1 merupakan server DNS yang berwenang untuk subdomain "baratayuda"
+
+Dikarenakan abimanyu akan didelegasikan ke DNS Slave, maka terdapat pengeditan konfigurasi di dalam `/etc/bind/named.conf.local` sebagai berikut:
+```
+zone "abimanyu.A02.com" {
+        type master;
+        allow-transfer { 10.0.1.5; }; // IP Werkudara
+        file "/etc/bind/jarkom/abimanyu.A02.com";
+};
+```
+
+Setelah itu, edit konfigurasi dari `/etc/bind/named.conf.options` menjadi seperti berikut:
+1. Tambahkan `allow-query{any;};`
+2. Comment `dnssec-validation auto;`
+
+Setelah itu, lakukan `service bind9 restart`
+
+Langkah berikutnya, adalah mengatur konfigurasi yang ada pada DNS Slave/Werkudara
+
+Pertama, edit konfigurasi pada `/etc/bind/named.conf.options` enjadi seperti berikut:
+1. Tambahkan `allow-query{any;};`
+2. Comment `dnssec-validation auto;`
+
+Setelah itu, edit konfigurasi yang ada pada `/etc/bind/Baratayuda/baratayuda.abimanyu.A02.com` menjadi seperti berikut:
+```
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     baratayuda.abimanyu.A02.com. root.baratayuda.abimanyu.A02.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@                       IN      NS      baratayuda.abimanyu.A02.com.
+@                       IN      A       10.0.3.3 ; IP Abimanyu
+www                     IN      CNAME   baratayuda.abimanyu.A03.com.
+```
+
+Lalu, edit juga konfigurasi pada `/etc/bind/named.conf.local` seperti berikut:
+```
+zone "abimanyu.A02.com" {
+        type master;
+        file "/etc/bind/Baratayuda/baratayuda.abimanyu.A02.com";
+};
+```
+
+Setelah itu, jalankan command `service bind9 restart`
+
+Untuk melihat hasilnya, dapat dijalankan command berikut pada client:
+```
+ping baratayuda.abimanyu.A02.com -c 5
+```
+atau
+```
+ping www.baratayuda.abimanyu.A02.com -c 5
+```
+
+Hasilnya adalah sebagai berikut:
+![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/3f4e7081-f7d6-494b-8bb5-e9b724fc06f2)
+
+
+# Nomor 8
+
+Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
 
 ## Jawaban
