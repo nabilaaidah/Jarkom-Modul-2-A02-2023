@@ -139,3 +139,79 @@ iface eth0 inet static
 	netmask 255.255.255.0
 	gateway 10.0.3.1
 ``` 
+
+
+# Nomor 2
+
+Buatlah website utama pada node arjuna dengan akses ke arjuna.yyy.com dengan alias www.arjuna.yyy.com dengan yyy merupakan kode kelompok.
+
+## Jawaban
+
+Dikarenakan ini adalah soal pertama, maka perlu dilakukan update dan install bind9. Dalam melakukan update dan instalasi maka nameserver DNS Master dihubungkan dengan router, yaitu sebagai berikut
+
+```
+echo 'nameserver 192.168.122.1' > /etc/resolv.conf
+apt-get update
+apt-get install bind9 -y
+service bind9 start
+```
+
+Setelah itu, karena ingin membuat website utama, maka perlu dilakukan mendefinisikan zona DNS yang akan diatur pada file `named.conf.local`. Dikarenakan ingin membuat website utama, yaitu `arjuna.yyy.com`, maka dibuatlah zone dalam `/etc/bind/named.conf.local` dengan code sebagai berikut:
+
+```
+zone "arjuna.A02.com" {
+        type master;
+        file "/etc/bind/jarkom/arjuna.A02.com";
+};
+```
+Penjelasan:
+- zone "arjuna.A02.com" adalah definisi zona DNS
+- type master berarti server DNS ini adalah zona master untuk domain tersebut
+- file "/etc/bind/jarkom/arjuna.A02.com" berarti lokasi di mana file zona DNS disimpan
+
+Setelah itu, masukkan konfigurasi dari zona DNS tersebut ke dalam `/etc/bind/jarkom/arjuna.A02.com`.
+
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     arjuna.A02.com. root.arjuna.A02.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      arjuna.A02.com.
+@       IN      A       10.0.2.2
+www     IN      CNAME   arjuna.A02.com.
+```
+Penjelasan:
+- `$TTL    604800` berarti bahwa waktu yang menunjukkan berapa lama catatan DNS dapat disimpan dalam cache, dalam case ini adalah 604800 detik atau 7 hari
+- SOA berarti bahwa pendefinisian otoritas dan parameter
+- `@       IN      NS      arjuna.A02.com.` berarti bahwa nameserver ini bertanggung jawab untuk domain "arjuna.A02.com"
+- `@ IN A 10.0.2.2` berarti bahwa catatan A (address) menghubungkan alamat IP 10.0.2.2 ke nama domain "@" atau "arjuna.A02.com"
+- `www     IN      CNAME   arjuna.A02.com.` berarti bahwa CMAME menghubungkan nama subdomain "www" ke domain "arjuna.A02.com" sehingga jika diakses "www.arjuna.A02.com", maka akan mengarah ke dalam "arjuna.A02.com"
+
+Setelah itu lakukan:
+
+```
+service bind9 restart
+```
+
+Hasilnya dapat dilihat melalui client, dengan mengetikkan
+
+```
+ping arjuna.A02.com -c 5
+```
+
+atau
+
+```
+ping www.arjuna.A02.com -c 5
+```
+
+Hasil:
+
+![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/8a3f3771-18f8-4bc6-9b89-2913bdb41b35)
