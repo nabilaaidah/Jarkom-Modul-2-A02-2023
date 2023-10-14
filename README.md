@@ -275,3 +275,92 @@ Hasilnya adalah sebagai berikut
 Kemudian, karena terdapat beberapa web yang harus di-deploy, buatlah subdomain parikesit.abimanyu.yyy.com yang diatur DNS-nya di Yudhistira dan mengarah ke Abimanyu.
 
 ## Jawaban
+
+Untuk membenruk subdomain yang telah ada, maka kita perlu mengedit file `/etc/bind/jarkom/abimanyu.A02.com` dan menambahkan subdomain "parikesit" di dalamnya.
+
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.A02.com. root.abimanyu.A02.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@              IN      NS      abimanyu.A02.com.
+@              IN      A       10.0.3.3
+www            IN      CNAME   abimanyu.a07.com.
+parikesit      IN      A       10.0.3.3
+```
+Penjelasan:
+- Pada code ini, ditambahkan subdomain "parikesit"
+- `parikesit      IN      A       10.0.3.3` berarti bahwa subdomain "parikesit" akan dihubungkan dengan IP 10.0.3.3
+
+Setelah itu, dapat dilihat hasilnya dalam node client. Untuk command yang digunakan adalah
+```
+ping parikesit.abimanyu.A02.com -c 5
+```
+
+Hasilnya adalah sebagai berikut
+![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/b5af2085-d932-4874-89fa-e085b09b495f)
+
+
+
+# Nomor 5
+
+Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
+
+## Jawaban
+
+Reverse domain digunakan untuk menerjemahkan alamat IP menjadi nama domain. Untuk membentuk reverse domain, maka diperlukan adanya pendefinisian zone baru dalam `/etc/bin/named.conf.local`. Definisi zone baru tersebut adalah sebagai berikut:
+```
+zone "2.172.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/jarkom/2.172.192.in-addr.arpa";
+};
+```
+Penjelasan:
+- Dalam zone ini, kita mengetahui bahwa terdapat ip domain yang dibalik, hal ini digunakan untuk memetakan alamat IP ke nama domain dalam struktur hierarkis DNS.
+- Penulisan in-addr.arpa digunakan untuk reverse domain
+
+Setelah itu, hal yang dilakukan adalah memuat konfigurasi ke dalam `/etc/bind/jarkom/3.0.10.in-addr.arpa.`. Konfigurasi yang akan dimuat adalah sebagai berikut
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     arjuna.A02.com. root.arjuna.A02.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+2.0.10.in-addr.arpa.   IN      NS      arjuna.A02.com.
+2                      IN      PTR     arjuna.A02.com.
+```
+Penjelasan:
+- Pada code ini dapat diketahui bahwa IP 10.0.2.2 merujuk ke server "arjuna.A02.com"
+
+Untuk melihat hasilnya di client, maka dapat dilakukan
+```
+echo 'nameserver 192.168.122.1 > /etc/resolv.conf'
+apt-get update
+apt-get install dnsutils
+echo 'nameserver 10.0.1.4 > /etc/resolv.conf'
+host -t PTR 10.0.3.3
+```
+
+Hasil yang didapatkan adalah sebagai berikut
+
+![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/2ec93fd9-c529-40b5-8f29-72ee04c8cad4)
+
+
+# Nomor 6
+
+Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
+
+## Jawaban
