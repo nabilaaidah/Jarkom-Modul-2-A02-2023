@@ -265,6 +265,10 @@ atau
 ping www.abimanyu.A02.com -c 5
 ```
 
+Hasilnya adalah sebagai berikut
+
+![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/b3b41b7c-879a-4997-b7d3-8922e6754004)
+
 
 # Nomor 4
 
