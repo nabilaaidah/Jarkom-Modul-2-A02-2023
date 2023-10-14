@@ -537,3 +537,216 @@ Hasilnya adalah sebagai berikut:
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
 
 ## Jawaban
+
+Edit konfigurasi yang ada pada file `/etc/bind/Baratayuda/baratayuda.abimanyu.A02.com` di dalam DNS Slave/Werkudara sebagai berikut:
+```
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     baratayuda.abimanyu.A02.com. root.baratayuda.abimanyu.A02.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@                       IN      NS      baratayuda.abimanyu.A02.com.
+@                       IN      A       10.0.3.3 ; IP Abimanyu
+www                     IN      CNAME   baratayuda.abimanyu.A02.com.
+rjp                     IN      A       10.0.3.3 ; IP Abimanyu
+www.rjp                 IN      CNAME   baratayuda.abimanyu.A02.com.
+```
+
+Setelah itu, jalankan `service bind9 restart`
+
+Untuk melihat hasilnya, dapat dilakukan pada node client dengan menjalankan code sebagai berikut:
+```
+ping rjp.baratayuda.abimanyu.A02.com -c 5
+```
+atau
+```
+ping www.rjp.baratayuda.abimanyu.A02.com -c 5
+```
+
+Hasilnya adalah sebagai berikut:
+![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/1703858b-d116-4318-bc65-a363cd5c4661)
+
+
+# Nomor 9
+
+Arjuna merupakan suatu Load Balancer Nginx dengan tiga worker (yang juga menggunakan nginx sebagai webserver) yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Lakukan deployment pada masing-masing worker.
+
+## Jawaban
+
+Pada nomor ini digunakan folder dari luar. Untuk menghubungkan folder tersebut dengan topologi yang ada di gns3, saya menggunakan github.
+
+Pada node worker, dibuat konfigurasi seperti berikut:
+```
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+apt-get update && apt install nginx php php-fpm -y
+
+php -v
+
+mkdir /var/www/jarkom
+
+apt-get install git -y
+
+git -c http.sslVerify-false clone https://github.com/nabilaaidah/arjuna.yyy /var/www/jarkom
+
+echo '
+ server {
+        listen 80;
+        root /var/www/jarkom;
+        index index.php index.html index.htm;
+        server_name _;
+
+        location / {
+                        try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        # pass PHP scripts to FastCGI server
+        location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+        }
+
+ location ~ /\.ht {
+                        deny all;
+        }
+
+        error_log /var/log/nginx/jarkom_error.log;
+        access_log /var/log/nginx/jarkom_access.log;
+ }
+' > /etc/nginx/sites-available/jarkom
+
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
+
+rm -rf /etc/nginx/sites-enabled/default
+
+service php7.2-fpm start
+
+service nginx reload
+
+service nginx restart
+
+nginx -t
+```
+
+Lalu, buat juga konfigurasi pada load balancer, sebagai berikut
+```
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+
+apt-get update
+apt-get install nginx
+
+echo ' # Default menggunakan Round Robin
+ upstream myweb  {
+  server 10.0.3.2; 
+  server 10.0.3.3; 
+  server 10.0.3.4;
+ }
+
+ server {
+  listen 80;
+  server_name arjuna.A02.com;
+
+  location / {
+  proxy_pass http://myweb;
+  }
+ }' > /etc/nginx/sites-available/lb-jarkom
+
+ln -s /etc/nginx/sites-available/lb-jarkom /etc/nginx/sites-enabled/lb-jarkom
+```
+
+Selanjutnya adalah melihat hasil pada client dengan lynx.
+```
+apt-get update
+apt-get install lynx
+```
+
+Deploy index.php pada client dengan menjalankan command berikut
+```
+lynx [ip webserver]
+```
+
+Salah satu hasil pada node Prabukusuma:
+![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/fc648f4a-5178-4a9a-8e24-ed9c070ee675)
+
+
+# Nomor 10
+
+Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan server_name pada soal nomor 1. Untuk melakukan pengecekan akses alamat web tersebut kemudian pastikan worker yang digunakan untuk menangani permintaan akan berganti ganti secara acak. Untuk webserver di masing-masing worker wajib berjalan di port 8001-8003. Contoh
+    - Prabakusuma:8001
+    - Abimanyu:8002
+    - Wisanggeni:8003
+
+## Jawaban
+
+Pertama, lakukan edit konfigurasi pada masing-masing webserver dengan menambahkan listen port. Contohnya adalah sebagai berikut pada webserver Abimanyu:
+```
+echo "nameserver 192.168.122.1" > /etc/resolv.conf
+
+echo '
+ server {
+        listen 8002;
+        root /var/www/jarkom;
+        index index.php index.html index.htm;
+        server_name _;
+
+        location / {
+                        try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        # pass PHP scripts to FastCGI server
+        location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+        }
+
+ location ~ /\.ht {
+                        deny all;
+        }
+
+        error_log /var/log/nginx/jarkom_error.log;
+        access_log /var/log/nginx/jarkom_access.log;
+ }
+' > /etc/nginx/sites-available/jarkom
+
+service nginx restart
+```
+
+Setelah itu, edit juga konfigurasi yang ada pada load balancer menjadi seperti ini
+```
+echo ' # Default menggunakan Round Robin
+ upstream myweb  {
+  server 10.0.3.2:8001; 
+  server 10.0.3.3:8002; 
+  server 10.0.3.4:8003;
+ }
+
+ server {
+  listen 80;
+  server_name arjuna.A02.com;
+
+  location / {
+  proxy_pass http://myweb;
+  }
+ }' > /etc/nginx/sites-available/lb-jarkom
+service nginx restart
+```
+
+Selanjutkan, lihat hasil melalui node client dengan mengetikkan command sebagai berikut untuk node Abimanyu:
+```
+lynx 10.0.3.3:8002
+```
+
+Dan hasilnya adalah sebagai berikut:
+![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/7dbbbef0-4e3c-4e55-870c-4bafafbba8f4)
+
+
+# Soal 11
+
+Selain menggunakan Nginx, lakukan konfigurasi Apache Web Server pada worker Abimanyu dengan web server www.abimanyu.yyy.com. Pertama dibutuhkan web server dengan DocumentRoot pada /var/www/abimanyu.yyy
+
+## Jawaban
