@@ -191,7 +191,7 @@ Penjelasan:
 - `$TTL    604800` berarti bahwa waktu yang menunjukkan berapa lama catatan DNS dapat disimpan dalam cache, dalam case ini adalah 604800 detik atau 7 hari
 - SOA berarti bahwa pendefinisian otoritas dan parameter
 - `@       IN      NS      arjuna.A02.com.` berarti bahwa nameserver ini bertanggung jawab untuk domain "arjuna.A02.com"
-- `@ IN A 10.0.2.2` berarti bahwa catatan A (address) menghubungkan alamat IP 10.0.2.2 ke nama domain "@" atau "arjuna.A02.com"
+- `@ IN A 10.0.2.2` berarti bahwa catatan A (address) menghubungkan alamat IP 10.0.2.2 (Arjuna) ke nama domain "@" atau "arjuna.A02.com"
 - `www     IN      CNAME   arjuna.A02.com.` berarti bahwa CMAME menghubungkan nama subdomain "www" ke domain "arjuna.A02.com" sehingga jika diakses "www.arjuna.A02.com", maka akan mengarah ke dalam "arjuna.A02.com"
 
 Setelah itu lakukan:
@@ -200,7 +200,7 @@ Setelah itu lakukan:
 service bind9 restart
 ```
 
-Hasilnya dapat dilihat melalui client, dengan mengetikkan
+Hasilnya dapat dilihat melalui client dengan melakukan setting resolv.conf terlebih dahulu ke arah IP DNS Master lalu untuk melakukan tes hasil, dapat diketikkan
 
 ```
 ping arjuna.A02.com -c 5
@@ -215,3 +215,59 @@ ping www.arjuna.A02.com -c 5
 Hasil:
 
 ![image](https://github.com/nabilaaidah/Jarkom-Modul-2-A02-2023/assets/110476969/8a3f3771-18f8-4bc6-9b89-2913bdb41b35)
+
+
+# Nomor 3
+
+Dengan cara yang sama seperti soal nomor 2, buatlah website utama dengan akses ke abimanyu.yyy.com dan alias www.abimanyu.yyy.com.
+
+## Jawaban
+
+Cara menjawab nomor 3 sama seperti nomor 2, namun perbedaannya hanya di domain yang akan diakses.
+
+Definisikan zone ke dalam `/etc/bind/named.conf.local`
+
+```
+zone "abimanyu.A02.com" {
+        type master;
+        file "/etc/bind/jarkom/abimanyu.A02.com";
+};
+```
+
+Setelah itu, masukkan konfigurasi domain tersebut ke dalam file `/etc/bind/jarkom/abimanyu.A02.com`
+
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.A02.com. root.abimanyu.A02.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      abimanyu.A02.com.
+@       IN      A       10.0.3.3
+www     IN      CNAME   abimanyu.A02.com.
+```
+
+Lalu, untuk melihat hasil dapat dilakukan di node client dengan mengetiikan command sebagai berikut
+
+```
+ping abimanyu.A02.com -c 5
+```
+
+atau
+
+```
+ping www.abimanyu.A02.com -c 5
+```
+
+
+# Nomor 4
+
+Kemudian, karena terdapat beberapa web yang harus di-deploy, buatlah subdomain parikesit.abimanyu.yyy.com yang diatur DNS-nya di Yudhistira dan mengarah ke Abimanyu.
+
+## Jawaban
