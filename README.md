@@ -1297,5 +1297,5 @@ Hasil dari code ini dapat dilihat dalam client dengan mengetikkan `lynx www.pari
 
 
 # Kendala
-- Terminal GNS3 dan telnet yang tidak memadai untuk copy sehingga script bisa disimpan di local
+- Terminal GNS3 dan telnet yang tidak memadai untuk copy sehingga script tidak bisa disimpan di local
 - Baru menyadari adanya folder .zip di hampir akhir praktikum sehingga harus mengulang dari awal
